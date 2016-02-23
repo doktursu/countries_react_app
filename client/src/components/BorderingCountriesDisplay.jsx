@@ -11,7 +11,6 @@ var BorderingCountriesDisplay = React.createClass({
     },
 
     render: function() {
-
         var createButtons = function(country, index) {
             return <button value={index} key={index} onClick={this.handleClick}>{country.name}</button>
         }.bind(this);

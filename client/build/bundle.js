@@ -19666,6 +19666,7 @@
 	
 	var React = __webpack_require__(1);
 	
+	var RegionsSelect = __webpack_require__(163);
 	var CountriesSelect = __webpack_require__(160);
 	var CountryDisplay = __webpack_require__(161);
 	
@@ -19711,6 +19712,7 @@
 	                null,
 	                'CountriesBox'
 	            ),
+	            React.createElement(RegionsSelect, { countries: this.state.countries }),
 	            React.createElement(CountriesSelect, { countries: this.state.countries, onSelectCountry: this.setCurrentCountry }),
 	            countryDisplay
 	        );
@@ -19854,7 +19856,6 @@
 	    },
 	
 	    render: function render() {
-	
 	        var createButtons = function (country, index) {
 	            return React.createElement(
 	                'button',
@@ -19872,6 +19873,72 @@
 	});
 	
 	module.exports = BorderingCountriesDisplay;
+
+/***/ },
+/* 163 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var React = __webpack_require__(1);
+	
+	var RegionsSelect = React.createClass({
+	    displayName: 'RegionsSelect',
+	
+	
+	    getInitialState: function getInitialState() {
+	        return { selectedIndex: null };
+	    },
+	
+	    handleChange: function handleChange() {},
+	
+	    filterRegions: function filterRegions() {
+	        var regions = this.props.countries.reduce(function (regions, country) {
+	            if (!regions.includes(country.region)) {
+	                regions.push(country.region);
+	            }
+	            return regions;
+	        }, []);
+	
+	        regions.unshift('All');
+	
+	        var index = regions.indexOf('');
+	        if (index !== -1) {
+	            regions[index] = 'Other';
+	        }
+	
+	        return regions;
+	    },
+	
+	    render: function render() {
+	        var createOption = function createOption(region, index) {
+	            return React.createElement(
+	                'option',
+	                {
+	                    value: index,
+	                    key: index },
+	                region
+	            );
+	        };
+	
+	        return React.createElement(
+	            'div',
+	            null,
+	            React.createElement(
+	                'h4',
+	                null,
+	                'RegionsSelect'
+	            ),
+	            React.createElement(
+	                'select',
+	                { value: this.state.selectedIndex, onChange: this.handleChange },
+	                this.filterRegions().map(createOption)
+	            )
+	        );
+	    }
+	});
+	
+	module.exports = RegionsSelect;
 
 /***/ }
 /******/ ]);

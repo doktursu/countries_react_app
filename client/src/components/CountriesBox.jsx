@@ -1,5 +1,6 @@
 var React = require('react');
 
+var RegionsSelect = require('./RegionsSelect.jsx');
 var CountriesSelect = require('./CountriesSelect.jsx');
 var CountryDisplay = require('./CountryDisplay.jsx');
 
@@ -36,6 +37,7 @@ var CountriesBox = React.createClass({
         return (
             <div>
                 <h4>CountriesBox</h4>
+                <RegionsSelect countries={this.state.countries}/>
                 <CountriesSelect countries={this.state.countries} onSelectCountry={this.setCurrentCountry}/>
                 {countryDisplay}
             </div>
