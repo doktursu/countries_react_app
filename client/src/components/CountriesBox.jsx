@@ -1,13 +1,12 @@
 var React = require('react');
 
 var RegionsSelect = require('./RegionsSelect.jsx');
-var CountriesSelect = require('./CountriesSelect.jsx');
 var CountryDisplay = require('./CountryDisplay.jsx');
 
 var CountriesBox = React.createClass({
 
     getInitialState: function() {
-        return {countries: [], currentCountry: null};
+        return {countries: [], currentCountry: null, regions: []};
     },
 
     setCurrentCountry: function(country){
@@ -22,9 +21,27 @@ var CountriesBox = React.createClass({
             var data = JSON.parse(request.responseText);
             console.log('got data', data);
             console.log('this', this);
-            this.setState({countries: data, currentCountry: data[0]});
+            this.setState({countries: data, currentCountry: data[0], regions: this.filterRegions(data)});
         }
         request.send(null);
+    },
+
+    filterRegions: function(countries) {
+        var regions = countries.reduce(function(regions, country) {
+            if (!regions.includes(country.region)) {
+                regions.push(country.region);
+            }
+            return regions;
+        }, []);
+
+        regions.unshift('All');
+
+        var index = regions.indexOf('');
+        if (index !== -1) {
+            regions[index] = 'Other';
+        }
+
+        return regions;
     },
 
     render: function() {
@@ -37,9 +54,7 @@ var CountriesBox = React.createClass({
         return (
             <div>
                 <h4>CountriesBox</h4>
-                <RegionsSelect countries={this.state.countries}/>
-                <CountriesSelect countries={this.state.countries} onSelectCountry={this.setCurrentCountry}/>
-                {countryDisplay}
+                <RegionsSelect countries={this.state.countries} regions={this.state.regions} onSelectCountry={this.setCurrentCountry}/>
             </div>
         );
     }

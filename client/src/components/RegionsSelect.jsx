@@ -1,31 +1,33 @@
 var React = require('react');
 
+var CountriesSelect = require('./CountriesSelect.jsx');
+
 var RegionsSelect = React.createClass({
 
     getInitialState: function() {
-        return {selectedIndex: null};
+        return {selectedIndex: null, filteredCountries: []};
     },
 
-    handleChange: function() {
+    handleChange: function(e) {
+        e.preventDefault();
+        var index = e.target.value;
 
+        var region = this.props.regions[index];
+        var countries = this.filterCountriesByRegion(region)
+        this.setState({filteredCountries: countries});
     },
 
-    filterRegions: function() {
-        var regions = this.props.countries.reduce(function(regions, country) {
-            if (!regions.includes(country.region)) {
-                regions.push(country.region);
-            }
-            return regions;
-        }, []);
+    filterCountriesByRegion: function(region) {
+        if (region === 'All') return this.props.countries;
+        console.log(region);
+        if (region === 'Other') region = '';
+        return this.props.countries.filter(function(country) {
+            return country.region === region;
+        });
+    },
 
-        regions.unshift('All');
-
-        var index = regions.indexOf('');
-        if (index !== -1) {
-            regions[index] = 'Other';
-        }
-        
-        return regions;
+    componentDidMount: function() {
+        this.setState({filteredCountries: this.props.countries});
     },
 
     render: function() {
@@ -40,8 +42,9 @@ var RegionsSelect = React.createClass({
             <div>
                 <h4>RegionsSelect</h4>
                 <select value={this.state.selectedIndex} onChange={this.handleChange}>
-                    {this.filterRegions().map(createOption)}
+                    {this.props.regions.map(createOption)}
                 </select>
+                <CountriesSelect countries={this.state.filteredCountries} onSelectCountry={this.props.onSelectCountry}/>
             </div>
         );
     }

@@ -19667,7 +19667,6 @@
 	var React = __webpack_require__(1);
 	
 	var RegionsSelect = __webpack_require__(163);
-	var CountriesSelect = __webpack_require__(160);
 	var CountryDisplay = __webpack_require__(161);
 	
 	var CountriesBox = React.createClass({
@@ -19675,7 +19674,7 @@
 	
 	
 	    getInitialState: function getInitialState() {
-	        return { countries: [], currentCountry: null };
+	        return { countries: [], currentCountry: null, regions: [] };
 	    },
 	
 	    setCurrentCountry: function setCurrentCountry(country) {
@@ -19692,9 +19691,27 @@
 	            var data = JSON.parse(request.responseText);
 	            console.log('got data', data);
 	            console.log('this', _this);
-	            _this.setState({ countries: data, currentCountry: data[0] });
+	            _this.setState({ countries: data, currentCountry: data[0], regions: _this.filterRegions(data) });
 	        };
 	        request.send(null);
+	    },
+	
+	    filterRegions: function filterRegions(countries) {
+	        var regions = countries.reduce(function (regions, country) {
+	            if (!regions.includes(country.region)) {
+	                regions.push(country.region);
+	            }
+	            return regions;
+	        }, []);
+	
+	        regions.unshift('All');
+	
+	        var index = regions.indexOf('');
+	        if (index !== -1) {
+	            regions[index] = 'Other';
+	        }
+	
+	        return regions;
 	    },
 	
 	    render: function render() {
@@ -19712,9 +19729,7 @@
 	                null,
 	                'CountriesBox'
 	            ),
-	            React.createElement(RegionsSelect, { countries: this.state.countries }),
-	            React.createElement(CountriesSelect, { countries: this.state.countries, onSelectCountry: this.setCurrentCountry }),
-	            countryDisplay
+	            React.createElement(RegionsSelect, { countries: this.state.countries, regions: this.state.regions, onSelectCountry: this.setCurrentCountry })
 	        );
 	    }
 	});
@@ -19882,32 +19897,36 @@
 	
 	var React = __webpack_require__(1);
 	
+	var CountriesSelect = __webpack_require__(160);
+	
 	var RegionsSelect = React.createClass({
 	    displayName: 'RegionsSelect',
 	
 	
 	    getInitialState: function getInitialState() {
-	        return { selectedIndex: null };
+	        return { selectedIndex: null, filteredCountries: [] };
 	    },
 	
-	    handleChange: function handleChange() {},
+	    handleChange: function handleChange(e) {
+	        e.preventDefault();
+	        var index = e.target.value;
 	
-	    filterRegions: function filterRegions() {
-	        var regions = this.props.countries.reduce(function (regions, country) {
-	            if (!regions.includes(country.region)) {
-	                regions.push(country.region);
-	            }
-	            return regions;
-	        }, []);
+	        var region = this.props.regions[index];
+	        var countries = this.filterCountriesByRegion(region);
+	        this.setState({ filteredCountries: countries });
+	    },
 	
-	        regions.unshift('All');
+	    filterCountriesByRegion: function filterCountriesByRegion(region) {
+	        if (region === 'All') return this.props.countries;
+	        console.log(region);
+	        if (region === 'Other') region = '';
+	        return this.props.countries.filter(function (country) {
+	            return country.region === region;
+	        });
+	    },
 	
-	        var index = regions.indexOf('');
-	        if (index !== -1) {
-	            regions[index] = 'Other';
-	        }
-	
-	        return regions;
+	    componentDidMount: function componentDidMount() {
+	        this.setState({ filteredCountries: this.props.countries });
 	    },
 	
 	    render: function render() {
@@ -19932,8 +19951,9 @@
 	            React.createElement(
 	                'select',
 	                { value: this.state.selectedIndex, onChange: this.handleChange },
-	                this.filterRegions().map(createOption)
-	            )
+	                this.props.regions.map(createOption)
+	            ),
+	            React.createElement(CountriesSelect, { countries: this.state.filteredCountries, onSelectCountry: this.props.onSelectCountry })
 	        );
 	    }
 	});
