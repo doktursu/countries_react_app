@@ -1,19 +1,24 @@
 var React = require('react');
 
 var RegionsSelect = require('./RegionsSelect.jsx');
+var CountriesSelect = require('./CountriesSelect.jsx');
 var CountryDisplay = require('./CountryDisplay.jsx');
 
 var CountriesBox = React.createClass({
 
     getInitialState: function() {
-        return {countries: [], currentCountry: null, regions: []};
+        return {countries: [], currentCountry: null, regions: [], filteredCountries: []};
     },
 
     setCurrentCountry: function(country){
         this.setState({currentCountry: country});
     },
 
-    componentDidMount: function() {
+    setFilteredCountries: function(countries) {
+        this.setState({filteredCountries: countries});
+    },
+
+    componentWillMount: function() {
         var url = 'https://restcountries.eu/rest/v1/all';
         var request = new XMLHttpRequest();
         request.open('GET', url);
@@ -21,7 +26,7 @@ var CountriesBox = React.createClass({
             var data = JSON.parse(request.responseText);
             console.log('got data', data);
             console.log('this', this);
-            this.setState({countries: data, currentCountry: data[0], regions: this.filterRegions(data)});
+            this.setState({countries: data, currentCountry: data[0], regions: this.filterRegions(data), filteredCountries: data});
         }
         request.send(null);
     },
@@ -54,7 +59,8 @@ var CountriesBox = React.createClass({
         return (
             <div>
                 <h4>CountriesBox</h4>
-                <RegionsSelect countries={this.state.countries} regions={this.state.regions} onSelectCountry={this.setCurrentCountry}/>
+                <RegionsSelect countries={this.state.countries} regions={this.state.regions} onSelectRegion={this.setFilteredCountries}/>
+                <CountriesSelect countries={this.state.filteredCountries} onSelectCountry={this.setCurrentCountry}/>
                 {countryDisplay}
             </div>
         );

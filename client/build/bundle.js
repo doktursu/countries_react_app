@@ -19667,6 +19667,7 @@
 	var React = __webpack_require__(1);
 	
 	var RegionsSelect = __webpack_require__(163);
+	var CountriesSelect = __webpack_require__(160);
 	var CountryDisplay = __webpack_require__(161);
 	
 	var CountriesBox = React.createClass({
@@ -19674,14 +19675,18 @@
 	
 	
 	    getInitialState: function getInitialState() {
-	        return { countries: [], currentCountry: null, regions: [] };
+	        return { countries: [], currentCountry: null, regions: [], filteredCountries: [] };
 	    },
 	
 	    setCurrentCountry: function setCurrentCountry(country) {
 	        this.setState({ currentCountry: country });
 	    },
 	
-	    componentDidMount: function componentDidMount() {
+	    setFilteredCountries: function setFilteredCountries(countries) {
+	        this.setState({ filteredCountries: countries });
+	    },
+	
+	    componentWillMount: function componentWillMount() {
 	        var _this = this;
 	
 	        var url = 'https://restcountries.eu/rest/v1/all';
@@ -19691,7 +19696,7 @@
 	            var data = JSON.parse(request.responseText);
 	            console.log('got data', data);
 	            console.log('this', _this);
-	            _this.setState({ countries: data, currentCountry: data[0], regions: _this.filterRegions(data) });
+	            _this.setState({ countries: data, currentCountry: data[0], regions: _this.filterRegions(data), filteredCountries: data });
 	        };
 	        request.send(null);
 	    },
@@ -19729,7 +19734,8 @@
 	                null,
 	                'CountriesBox'
 	            ),
-	            React.createElement(RegionsSelect, { countries: this.state.countries, regions: this.state.regions, onSelectCountry: this.setCurrentCountry }),
+	            React.createElement(RegionsSelect, { countries: this.state.countries, regions: this.state.regions, onSelectRegion: this.setFilteredCountries }),
+	            React.createElement(CountriesSelect, { countries: this.state.filteredCountries, onSelectCountry: this.setCurrentCountry }),
 	            countryDisplay
 	        );
 	    }
@@ -19906,7 +19912,7 @@
 	
 	
 	    getInitialState: function getInitialState() {
-	        return { selectedIndex: null, filteredCountries: [] };
+	        return { selectedIndex: null };
 	    },
 	
 	    handleChange: function handleChange(e) {
@@ -19915,7 +19921,8 @@
 	
 	        var region = this.props.regions[index];
 	        var countries = this.filterCountriesByRegion(region);
-	        this.setState({ filteredCountries: countries });
+	
+	        this.props.onSelectRegion(countries);
 	    },
 	
 	    filterCountriesByRegion: function filterCountriesByRegion(region) {
@@ -19925,10 +19932,6 @@
 	        return this.props.countries.filter(function (country) {
 	            return country.region === region;
 	        });
-	    },
-	
-	    componentDidMount: function componentDidMount() {
-	        this.setState({ filteredCountries: this.props.countries });
 	    },
 	
 	    render: function render() {
@@ -19954,8 +19957,7 @@
 	                'select',
 	                { value: this.state.selectedIndex, onChange: this.handleChange },
 	                this.props.regions.map(createOption)
-	            ),
-	            React.createElement(CountriesSelect, { countries: this.state.filteredCountries, onSelectCountry: this.props.onSelectCountry })
+	            )
 	        );
 	    }
 	});

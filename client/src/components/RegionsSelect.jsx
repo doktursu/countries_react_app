@@ -5,7 +5,7 @@ var CountriesSelect = require('./CountriesSelect.jsx');
 var RegionsSelect = React.createClass({
 
     getInitialState: function() {
-        return {selectedIndex: null, filteredCountries: []};
+        return {selectedIndex: null};
     },
 
     handleChange: function(e) {
@@ -14,7 +14,8 @@ var RegionsSelect = React.createClass({
 
         var region = this.props.regions[index];
         var countries = this.filterCountriesByRegion(region)
-        this.setState({filteredCountries: countries});
+
+        this.props.onSelectRegion(countries);
     },
 
     filterCountriesByRegion: function(region) {
@@ -24,10 +25,6 @@ var RegionsSelect = React.createClass({
         return this.props.countries.filter(function(country) {
             return country.region === region;
         });
-    },
-
-    componentDidMount: function() {
-        this.setState({filteredCountries: this.props.countries});
     },
 
     render: function() {
@@ -44,7 +41,6 @@ var RegionsSelect = React.createClass({
                 <select value={this.state.selectedIndex} onChange={this.handleChange}>
                     {this.props.regions.map(createOption)}
                 </select>
-                <CountriesSelect countries={this.state.filteredCountries} onSelectCountry={this.props.onSelectCountry}/>
             </div>
         );
     }
