@@ -37,9 +37,7 @@ var CountriesBox = React.createClass({
                 regions.push(country.region);
             }
             return regions;
-        }, []);
-
-        regions.unshift('All');
+        }, ['All']);
 
         var index = regions.indexOf('');
         if (index !== -1) {
