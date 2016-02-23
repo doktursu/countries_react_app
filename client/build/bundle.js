@@ -19888,6 +19888,11 @@
 	        return React.createElement(
 	            'div',
 	            null,
+	            React.createElement(
+	                'h4',
+	                null,
+	                'BorderingCountries'
+	            ),
 	            this.props.countries.map(createButtons)
 	        );
 	    }

@@ -17,6 +17,7 @@ var BorderingCountriesDisplay = React.createClass({
 
         return (
             <div>
+                <h4>BorderingCountries</h4>
                 {this.props.countries.map(createButtons)}
             </div>
         );
