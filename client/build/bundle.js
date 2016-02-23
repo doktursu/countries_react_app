@@ -19729,7 +19729,8 @@
 	                null,
 	                'CountriesBox'
 	            ),
-	            React.createElement(RegionsSelect, { countries: this.state.countries, regions: this.state.regions, onSelectCountry: this.setCurrentCountry })
+	            React.createElement(RegionsSelect, { countries: this.state.countries, regions: this.state.regions, onSelectCountry: this.setCurrentCountry }),
+	            countryDisplay
 	        );
 	    }
 	});
@@ -19759,6 +19760,7 @@
 	        this.setState({ selectedIndex: index });
 	
 	        var country = this.props.countries[index];
+	        console.log('selected country', country);
 	        this.props.onSelectCountry(country);
 	    },
 	

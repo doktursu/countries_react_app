@@ -55,6 +55,7 @@ var CountriesBox = React.createClass({
             <div>
                 <h4>CountriesBox</h4>
                 <RegionsSelect countries={this.state.countries} regions={this.state.regions} onSelectCountry={this.setCurrentCountry}/>
+                {countryDisplay}
             </div>
         );
     }

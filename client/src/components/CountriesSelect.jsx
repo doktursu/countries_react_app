@@ -12,7 +12,8 @@ var CountriesSelect = React.createClass({
         var index = e.target.value;
         this.setState({selectedIndex: index});
 
-        var country = this.props.countries[index]
+        var country = this.props.countries[index];
+        console.log('selected country', country);
         this.props.onSelectCountry(country);
     },
 
