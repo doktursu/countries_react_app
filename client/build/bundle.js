@@ -19675,15 +19675,19 @@
 	
 	
 	    getInitialState: function getInitialState() {
-	        return { countries: [], currentCountry: null, regions: [], filteredCountries: [] };
+	        return { countries: [], currentCountry: null, currentRegion: 'All' };
 	    },
 	
 	    setCurrentCountry: function setCurrentCountry(country) {
 	        this.setState({ currentCountry: country });
 	    },
 	
-	    setFilteredCountries: function setFilteredCountries(countries) {
-	        this.setState({ filteredCountries: countries });
+	    // setFilteredCountries: function(countries) {
+	    //     this.setState({filteredCountries: countries});
+	    // },
+	
+	    setCurrentRegion: function setCurrentRegion(region) {
+	        this.setState({ currentRegion: region });
 	    },
 	
 	    componentWillMount: function componentWillMount() {
@@ -19696,25 +19700,18 @@
 	            var data = JSON.parse(request.responseText);
 	            console.log('got data', data);
 	            console.log('this', _this);
-	            _this.setState({ countries: data, currentCountry: data[0], regions: _this.filterRegions(data), filteredCountries: data });
+	            _this.setState({ countries: data, currentCountry: data[0] });
 	        };
 	        request.send(null);
 	    },
 	
-	    filterRegions: function filterRegions(countries) {
-	        var regions = countries.reduce(function (regions, country) {
-	            if (!regions.includes(country.region)) {
-	                regions.push(country.region);
-	            }
-	            return regions;
-	        }, ['All']);
-	
-	        var index = regions.indexOf('');
-	        if (index !== -1) {
-	            regions[index] = 'Other';
-	        }
-	
-	        return regions;
+	    filterCountriesByRegion: function filterCountriesByRegion(region) {
+	        if (region === 'All') return this.state.countries;
+	        console.log(region);
+	        if (region === 'Other') region = '';
+	        return this.state.countries.filter(function (country) {
+	            return country.region === region;
+	        });
 	    },
 	
 	    render: function render() {
@@ -19732,8 +19729,8 @@
 	                null,
 	                'CountriesBox'
 	            ),
-	            React.createElement(RegionsSelect, { countries: this.state.countries, regions: this.state.regions, onSelectRegion: this.setFilteredCountries }),
-	            React.createElement(CountriesSelect, { countries: this.state.filteredCountries, onSelectCountry: this.setCurrentCountry }),
+	            React.createElement(RegionsSelect, { countries: this.state.countries, regions: this.state.regions, onSelectRegion: this.setCurrentRegion }),
+	            React.createElement(CountriesSelect, { countries: this.filterCountriesByRegion(this.state.currentRegion), onSelectCountry: this.setCurrentCountry }),
 	            countryDisplay
 	        );
 	    }
@@ -19920,30 +19917,45 @@
 	
 	    handleChange: function handleChange(e) {
 	        e.preventDefault();
-	        var index = e.target.value;
 	
-	        var region = this.props.regions[index];
-	        var countries = this.filterCountriesByRegion(region);
+	        var region = e.target.value;
+	        // var countries = this.filterCountriesByRegion(region)
 	
-	        this.props.onSelectRegion(countries);
+	        this.props.onSelectRegion(region);
 	    },
 	
-	    filterCountriesByRegion: function filterCountriesByRegion(region) {
-	        if (region === 'All') return this.props.countries;
-	        console.log(region);
-	        if (region === 'Other') region = '';
-	        return this.props.countries.filter(function (country) {
-	            return country.region === region;
-	        });
+	    filterRegions: function filterRegions(countries) {
+	        var regions = countries.reduce(function (regions, country) {
+	            if (!regions.includes(country.region)) {
+	                regions.push(country.region);
+	            }
+	            return regions;
+	        }, ['All']);
+	
+	        var index = regions.indexOf('');
+	        if (index !== -1) {
+	            regions[index] = 'Other';
+	        }
+	
+	        return regions;
 	    },
+	
+	    // filterCountriesByRegion: function(region) {
+	    //     if (region === 'All') return this.props.countries;
+	    //     console.log(region);
+	    //     if (region === 'Other') region = '';
+	    //     return this.props.countries.filter(function(country) {
+	    //         return country.region === region;
+	    //     });
+	    // },
 	
 	    render: function render() {
-	        var createOption = function createOption(region, index) {
+	        var createOption = function createOption(region) {
 	            return React.createElement(
 	                'option',
 	                {
-	                    value: index,
-	                    key: index },
+	                    value: region,
+	                    key: region },
 	                region
 	            );
 	        };
@@ -19959,7 +19971,7 @@
 	            React.createElement(
 	                'select',
 	                { value: this.state.selectedIndex, onChange: this.handleChange },
-	                this.props.regions.map(createOption)
+	                this.filterRegions(this.props.countries).map(createOption)
 	            )
 	        );
 	    }
